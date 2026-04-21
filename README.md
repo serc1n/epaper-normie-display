@@ -63,7 +63,18 @@ The entire web interface is a single HTML document embedded in firmware (`webpag
 
 ## Quick Start
 
-Connect your ESP32 e-paper board via USB and run a single command.
+Connect your ESP32 e-paper board via USB and run:
+
+```bash
+npx normie-display
+```
+
+That's it. This single command installs all dependencies, compiles the firmware, detects your board, and flashes it. Works on **macOS**, **Linux**, and **Windows**.
+
+> Requires [Node.js](https://nodejs.org) 16+. If you don't have Node, use the shell scripts below instead.
+
+<details>
+<summary><b>Alternative: shell scripts (no Node required)</b></summary>
 
 **macOS / Linux:**
 ```bash
@@ -75,7 +86,9 @@ curl -sL https://raw.githubusercontent.com/serc1n/epaper-normie-display/main/fla
 irm https://raw.githubusercontent.com/serc1n/epaper-normie-display/main/flash.ps1 | iex
 ```
 
-This will install all dependencies (arduino-cli, ESP32 board package, GxEPD2), compile the firmware, detect your board, and flash it automatically.
+</details>
+
+These will install all dependencies (arduino-cli, ESP32 board package, GxEPD2), compile the firmware, detect your board, and flash it automatically.
 
 Once flashed:
 1. Connect to Wi-Fi network **EPaper**
