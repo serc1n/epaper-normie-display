@@ -1,6 +1,6 @@
 {
   "name": "normie-display",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Flash Normie Display firmware to an ESP32 e-paper board",
   "bin": {
     "normie-display": "./cli.mjs"

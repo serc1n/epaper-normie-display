@@ -13,6 +13,8 @@ const REPO = "https://github.com/serc1n/epaper-normie-display.git";
 const FQBN = "esp32:esp32:esp32";
 const BAUD = 115200;
 const DIR = join(homedir(), "epaper-normie-display");
+const SKETCH_NAME = "epaper_receiver";
+const SKETCH_DIR = join(DIR, SKETCH_NAME);
 
 const WHITE = "\x1b[1;37m";
 const GREEN = "\x1b[1;32m";
@@ -166,6 +168,23 @@ if (existsSync(join(DIR, ".git"))) {
 } else {
   run(`git clone ${REPO} "${DIR}"`);
 }
+
+// arduino-cli requires the .ino filename to match its parent directory
+if (!existsSync(SKETCH_DIR)) {
+  run(IS_WIN
+    ? `mkdir "${SKETCH_DIR}"`
+    : `mkdir -p "${SKETCH_DIR}"`);
+}
+const sketchFiles = ["epaper_receiver.ino", "webpage.h", "partitions.csv"];
+for (const f of sketchFiles) {
+  const src = join(DIR, f);
+  const dst = join(SKETCH_DIR, f);
+  if (existsSync(src)) {
+    run(IS_WIN
+      ? `copy /Y "${src}" "${dst}"`
+      : `cp "${src}" "${dst}"`);
+  }
+}
 ok(`Source ready at ${DIR}`);
 
 // ── 5. Compile ──
@@ -177,9 +196,15 @@ const compileCmd = [
   `--build-property "build.partitions=partitions"`,
   `--build-property "upload.maximum_size=1572864"`,
   `--build-path "${buildPath}"`,
-  `"${DIR}"`,
+  `"${SKETCH_DIR}"`,
 ].join(" ");
+const bootloaderBin = join(buildPath, `${SKETCH_NAME}.ino.bootloader.bin`);
+const appBin = join(buildPath, `${SKETCH_NAME}.ino.bin`);
 run(compileCmd);
+if (!existsSync(appBin)) {
+  err("Compilation failed. Check the errors above.");
+  process.exit(1);
+}
 ok("Compiled successfully");
 
 // ── 6. Detect port ──
@@ -216,9 +241,9 @@ const flashCmd = [
   `"${esptool}" --chip esp32 --port ${port} --baud ${BAUD}`,
   "--before default-reset --after hard-reset",
   "write-flash -z --flash-mode dio --flash-freq 80m --flash-size 4MB",
-  `0x1000 "${buildPath}${sep}epaper_receiver.ino.bootloader.bin"`,
-  `0x8000 "${buildPath}${sep}epaper_receiver.ino.partitions.bin"`,
-  `0x10000 "${buildPath}${sep}epaper_receiver.ino.bin"`,
+  `0x1000 "${join(buildPath, SKETCH_NAME + ".ino.bootloader.bin")}"`,
+  `0x8000 "${join(buildPath, SKETCH_NAME + ".ino.partitions.bin")}"`,
+  `0x10000 "${join(buildPath, SKETCH_NAME + ".ino.bin")}"`,
 ].join(" ");
 
 const result = spawnSync(flashCmd, { shell: true, stdio: "inherit" });
