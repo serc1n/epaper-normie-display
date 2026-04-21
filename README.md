@@ -63,13 +63,19 @@ The entire web interface is a single HTML document embedded in firmware (`webpag
 
 ## Quick Start
 
-Connect your ESP32 e-paper board via USB and run:
+Connect your ESP32 e-paper board via USB and run a single command.
 
+**macOS / Linux:**
 ```bash
 curl -sL https://raw.githubusercontent.com/serc1n/epaper-normie-display/main/flash.sh | bash
 ```
 
-This will install all dependencies (arduino-cli, ESP32 board package, GxEPD2), compile the firmware, detect your board, and flash it automatically. Works on **macOS** and **Linux**.
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/serc1n/epaper-normie-display/main/flash.ps1 | iex
+```
+
+This will install all dependencies (arduino-cli, ESP32 board package, GxEPD2), compile the firmware, detect your board, and flash it automatically.
 
 Once flashed:
 1. Connect to Wi-Fi network **EPaper**
@@ -125,7 +131,8 @@ epaper-normie-display/
 ├── epaper_receiver.ino   # Main firmware (Wi-Fi AP, HTTP server, display driver, serial protocol)
 ├── webpage.h             # Embedded HTML/CSS/JS web interface
 ├── partitions.csv        # Custom flash partition table
-├── flash.sh              # One-command install, build & flash script
+├── flash.sh              # One-command install, build & flash (macOS/Linux)
+├── flash.ps1             # One-command install, build & flash (Windows)
 └── build/                # Compiled binaries (gitignored)
 ```
 
