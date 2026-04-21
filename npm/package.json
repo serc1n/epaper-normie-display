@@ -1,0 +1,31 @@
+{
+  "name": "normie-display",
+  "version": "1.0.0",
+  "description": "Flash Normie Display firmware to an ESP32 e-paper board",
+  "bin": {
+    "normie-display": "./cli.mjs"
+  },
+  "keywords": [
+    "normies",
+    "nft",
+    "esp32",
+    "e-paper",
+    "epaper",
+    "eink",
+    "firmware",
+    "flash",
+    "arduino",
+    "waveshare"
+  ],
+  "author": "Normies",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/serc1n/epaper-normie-display"
+  },
+  "homepage": "https://github.com/serc1n/epaper-normie-display#readme",
+  "engines": {
+    "node": ">=16"
+  },
+  "type": "module"
+}
