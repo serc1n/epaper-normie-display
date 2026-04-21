@@ -61,15 +61,34 @@ The entire web interface is a single HTML document embedded in firmware (`webpag
 | app0 | 0x10000 | 1.5MB | Application firmware |
 | normies | 0x190000 | 2.5MB | 10,000 Normie bitmaps (200 bytes each) |
 
-## Building & Flashing
+## Quick Start
+
+Connect your ESP32 e-paper board via USB and run:
+
+```bash
+curl -sL https://raw.githubusercontent.com/serc1n/epaper-normie-display/main/flash.sh | bash
+```
+
+This will install all dependencies (arduino-cli, ESP32 board package, GxEPD2), compile the firmware, detect your board, and flash it automatically. Works on **macOS** and **Linux**.
+
+Once flashed:
+1. Connect to Wi-Fi network **EPaper**
+2. Open **http://192.168.4.1**
+3. Enter a Normie ID or upload an image
+
+## Manual Build & Flash
 
 ### Requirements
-- Arduino IDE or arduino-cli
+- [arduino-cli](https://arduino.github.io/arduino-cli/installation/) or Arduino IDE
 - ESP32 Arduino core (v3.3.7+)
 - [GxEPD2](https://github.com/ZinggJM/GxEPD2) library
+- [esptool](https://github.com/espressif/esptool)
 
-### Compile
+### Clone & compile
 ```bash
+git clone https://github.com/serc1n/epaper-normie-display.git
+cd epaper-normie-display
+
 arduino-cli compile --fqbn esp32:esp32:esp32 \
   --build-property "build.partitions=partitions" \
   --build-property "upload.maximum_size=1572864" .
@@ -77,35 +96,37 @@ arduino-cli compile --fqbn esp32:esp32:esp32 \
 
 ### Flash firmware
 ```bash
-esptool --chip esp32 --port /dev/cu.usbmodem* --baud 115200 --no-stub \
-  write-flash --flash-mode dio --flash-freq 80m --flash-size 4MB \
+esptool --chip esp32 --port /dev/cu.usbmodem* --baud 115200 \
+  --before default-reset --after hard-reset \
+  write-flash -z --flash-mode dio --flash-freq 80m --flash-size 4MB \
   0x1000 build/epaper_receiver.ino.bootloader.bin \
   0x8000 build/epaper_receiver.ino.partitions.bin \
   0x10000 build/epaper_receiver.ino.bin
 ```
 
-### Flash normies data
-The normie bitmaps are flashed separately to the `normies` partition:
+### Flash normies data (optional)
+The normie bitmaps are flashed separately to the `normies` partition. Without this step, the Upload tab still works but the Normie ID tab will not display anything.
+
 ```bash
-esptool --chip esp32 --port /dev/cu.usbmodem* --baud 115200 --no-stub \
+esptool --chip esp32 --port /dev/cu.usbmodem* --baud 115200 \
   write-flash 0x190000 normies.bin
 ```
 
-To download the latest normie data from the API:
+Each normie is fetched from the on-chain API as a 1600-character binary string (40x40 pixels), then packed into 200 bytes MSB-first. 10,000 normies = 2,000,000 bytes total.
+
 ```bash
-# Each normie is a 1600-char binary string (40x40 pixels), packed into 200 bytes MSB-first
-# 10,000 normies × 200 bytes = 2,000,000 bytes
 curl https://api.normies.art/normie/{id}/pixels
 ```
 
 ## Project Structure
 
 ```
-epaper_receiver/
+epaper-normie-display/
 ├── epaper_receiver.ino   # Main firmware (Wi-Fi AP, HTTP server, display driver, serial protocol)
 ├── webpage.h             # Embedded HTML/CSS/JS web interface
 ├── partitions.csv        # Custom flash partition table
-└── build/                # Compiled binaries
+├── flash.sh              # One-command install, build & flash script
+└── build/                # Compiled binaries (gitignored)
 ```
 
 ## HTTP API
@@ -120,5 +141,7 @@ epaper_receiver/
 All endpoints return JSON responses: `{"ok": true/false, "message": "...", "error": "..."}`.
 
 ## License
+
+MIT License. See [LICENSE](LICENSE) for details.
 
 Built by Normies, for Normies.
