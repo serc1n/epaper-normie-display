@@ -4,8 +4,8 @@ ESP32 firmware that drives a 1.54" monochrome e-paper display (200x200) with a b
 
 ## Hardware
 
-- **MCU:** ESP32-D0WDQ6 (Waveshare ESP32 e-Paper Driver Board)
-- **Display:** 1.54" 200x200 monochrome e-paper (GxEPD2_154_D67)
+- **MCU:** [Waveshare ESP32 e-Paper Driver Board](https://www.waveshare.com/e-Paper-ESP32-Driver-Board.htm)
+- **Display:** [1.54" 200x200 monochrome e-paper](https://www.waveshare.com/product/displays/e-paper/epaper-3/1.54inch-e-paper.htm) (GxEPD2_154_D67)
 - **Flash:** 4MB SPI flash with custom partition table
 
 ### Pin Mapping
